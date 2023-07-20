@@ -14,7 +14,7 @@ using StringTools;
 
 @:keep
 class FileConsumer implements IConsumer {
-    private static var log:Logger = new Logger("esb.bundles.core.files.FileProducer");
+    private static var log:Logger = new Logger("esb.bundles.core.files.FileConsumer");
 
     public var bundle:IBundle;
     public function start(uri:Uri) {
