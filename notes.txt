@@ -1,0 +1,2 @@
+// nodemon file-bundle.js --json-config {\"type\":\"producer\",\"uri\":\"file://file-bundle/input?eip=InOut&pattern=*.txt&renameExtension=complete&pollInterval=5000\"}
+// nodemon file-bundle.js --json-config {\"type\":\"consumer\",\"uri\":\"file://file-bundle/output?eip=InOut&filename={file.name}-processed.{file.extension}\"}

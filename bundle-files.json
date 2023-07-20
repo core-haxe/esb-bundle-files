@@ -1,0 +1,21 @@
+{
+    "bundles": {
+        "bundle-files": {
+            "name": "bundle-files",
+            "bundle-file": "bundle-files",
+            "prefixes": {
+                "file": {
+                    "consumer": {
+                        "class": "esb.bundles.core.files.FileConsumer"
+                    },
+                    "producer": {
+                        "class": "esb.bundles.core.files.FileProducer"
+                    }
+                }
+            },
+            "properties": {
+                "default-poll-interval": "1000"
+            }
+        }
+    }
+}
