@@ -20,17 +20,18 @@ class FileProducer implements IProducer {
     public var bundle:IBundle;
     public function start(uri:Uri) {
         log.info('creating producer for ${uri.toString()}');
-        log.info('wait for files in "${uri.path}"');
+        log.info('waiting for files in "${uri.fullPath}"');
         processFolder(uri);
     }
 
 
     private static var _processing:Array<String> = [];
     private function processFolder(uri:Uri) {
-        var fullPath = Path.normalize(uri.path);
+        var fullPath = Path.normalize(uri.fullPath);
         if (!FileSystem.exists(fullPath)) {
             FileSystem.createDirectory(fullPath);
         }
+
         var pattern:String = uri.params.get("pattern");
         var extensionPattern:String = null;
         if (pattern != null && pattern.startsWith("*.")) {
