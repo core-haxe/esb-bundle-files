@@ -25,6 +25,7 @@ class FileProducer implements IProducer {
     }
 
 
+    private static var _processing:Array<String> = [];
     private function processFolder(uri:Uri) {
         var fullPath = Path.normalize(uri.path);
         if (!FileSystem.exists(fullPath)) {
@@ -49,8 +50,11 @@ class FileProducer implements IProducer {
                     }
                 }
                 if (use == true) {
-                    log.info('eligible file found: "${itemFullPath}"');
-                    eligibleItems.push(itemFullPath);
+                    if (!_processing.contains(itemFullPath)) {
+                        log.info('eligible file found: "${itemFullPath}"');
+                        eligibleItems.push(itemFullPath);
+                        _processing.push(itemFullPath);
+                    }
                 }
             }
         }
@@ -68,6 +72,7 @@ class FileProducer implements IProducer {
         var pollInterval = uri.paramInt("pollInterval", 1000);
         var renameExtension = uri.param("renameExtension");
 
+        /*
         var start = Sys.time();
         runAllMapped(promises).then(results -> {
             for (item in results.keys()) {
@@ -92,5 +97,39 @@ class FileProducer implements IProducer {
             haxe.Timer.delay(processFolder.bind(uri), pollInterval);
             trace(error);
         });
+        */
+
+        if (promises.length > 0) {
+            var start = Sys.time();
+            var max = promises.length;
+            for (promise in promises) {
+                promise.promise().then(result -> {
+                    if (result != null) { // TODO: is null meaning non-failure a valid assumption?
+                        var item = promise.id;
+                        if (renameExtension != null) {
+                            var path = new Path(item);
+                            var originalPath = item;
+                            path.ext = renameExtension;
+                            var newPath = path.toString();
+                            log.info('renaming file "${originalPath}" -> "${newPath}"');
+                            FileSystem.rename(originalPath, newPath);
+                        }
+                        _processing.remove(item);
+                    }
+                    max--;
+                    if (max == 0) {
+                        var end = Sys.time();
+                        trace("-------------------------------------------------> ALL DONE IN: ", Math.round((end - start) * 1000) + " ms");
+                        //haxe.Timer.delay(processFolder.bind(uri), pollInterval);
+                    }
+                }, error -> {
+                    trace(">>>>>>>>>>>>>>>>>>>>>>>>>> ERROR", error);
+                });
+            }
+        } else {
+            //haxe.Timer.delay(processFolder.bind(uri), pollInterval);
+        }
+
+        haxe.Timer.delay(processFolder.bind(uri), pollInterval);
     }
 }

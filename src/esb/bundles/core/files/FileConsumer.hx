@@ -19,7 +19,7 @@ class FileConsumer implements IConsumer {
     public var bundle:IBundle;
     public function start(uri:Uri) {
         log.info('creating consumer for ${uri.toString()}');
-        from(uri, message -> {
+        from(uri, (uri, message) -> {
             return new Promise((resolve, reject) -> {
                 var fullPath = Path.normalize(uri.path);
                 if (!FileSystem.exists(fullPath)) {
