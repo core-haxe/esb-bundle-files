@@ -22,6 +22,8 @@ class FileConsumer implements IConsumer {
         from(uri, (uri, message) -> {
             return new Promise((resolve, reject) -> {
                 var fullPath = Path.normalize(uri.fullPath);
+                // TODO: do better
+                fullPath = fullPath.replace("C/", "C:/");
                 if (!FileSystem.exists(fullPath)) {
                     FileSystem.createDirectory(fullPath);
                 }

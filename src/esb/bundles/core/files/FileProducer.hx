@@ -28,6 +28,7 @@ class FileProducer implements IProducer {
     private static var _processing:Array<String> = [];
     private function processFolder(uri:Uri) {
         var fullPath = Path.normalize(uri.fullPath);
+        fullPath = fullPath.replace("C/", "C:/");
         if (!FileSystem.exists(fullPath)) {
             FileSystem.createDirectory(fullPath);
         }
@@ -73,33 +74,6 @@ class FileProducer implements IProducer {
         var pollInterval = uri.paramInt("pollInterval", 1000);
         var renameExtension = uri.param("renameExtension");
 
-        /*
-        var start = Sys.time();
-        runAllMapped(promises).then(results -> {
-            for (item in results.keys()) {
-                var result = results.get(item);
-                if (result != null) { // TODO: is null meaning non-failure a valid assumption?
-                    if (renameExtension != null) {
-                        var path = new Path(item);
-                        var originalPath = item;
-                        path.ext = renameExtension;
-                        var newPath = path.toString();
-                        log.info('renaming file "${originalPath}" -> "${newPath}"');
-                        FileSystem.rename(originalPath, newPath);
-                    }
-                }
-            }
-            var end = Sys.time();
-            trace("-------------------------------------------------> ALL DONE IN: ", Math.round((end - start) * 1000) + " ms");
-
-            haxe.Timer.delay(processFolder.bind(uri), pollInterval);
-            return null;
-        }, error -> {
-            haxe.Timer.delay(processFolder.bind(uri), pollInterval);
-            trace(error);
-        });
-        */
-
         if (promises.length > 0) {
             var start = Sys.time();
             var max = promises.length;
@@ -121,16 +95,15 @@ class FileProducer implements IProducer {
                     if (max == 0) {
                         var end = Sys.time();
                         trace("-------------------------------------------------> ALL DONE IN: ", Math.round((end - start) * 1000) + " ms");
-                        //haxe.Timer.delay(processFolder.bind(uri), pollInterval);
+                        haxe.Timer.delay(processFolder.bind(uri), pollInterval);
                     }
                 }, error -> {
                     trace(">>>>>>>>>>>>>>>>>>>>>>>>>> ERROR", error);
+                    haxe.Timer.delay(processFolder.bind(uri), pollInterval);
                 });
             }
         } else {
-            //haxe.Timer.delay(processFolder.bind(uri), pollInterval);
+            haxe.Timer.delay(processFolder.bind(uri), pollInterval);
         }
-
-        haxe.Timer.delay(processFolder.bind(uri), pollInterval);
     }
 }
