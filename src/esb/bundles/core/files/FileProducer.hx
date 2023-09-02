@@ -67,7 +67,9 @@ class FileProducer implements IProducer {
             var message = createMessage(RawBody);
             message.properties.set("file.name", path.file);
             message.properties.set("file.extension", path.ext);
-            message.body.fromBytes(File.getBytes(item));
+            var fileBytes = File.getBytes(item);
+            message.properties.set("file.hash", haxe.crypto.Md5.make(fileBytes).toString());
+            message.body.fromBytes(fileBytes);
             promises.push({id: item, promise: to.bind(uri, message)});
         }
 
