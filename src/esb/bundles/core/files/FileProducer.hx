@@ -1,5 +1,6 @@
 package esb.bundles.core.files;
 
+import esb.core.config.sections.EsbConfig;
 import esb.core.IBundle;
 import sys.io.File;
 import sys.FileSystem;
@@ -20,15 +21,14 @@ class FileProducer implements IProducer {
     public var bundle:IBundle;
     public function start(uri:Uri) {
         log.info('creating producer for ${uri.toString()}');
-        log.info('waiting for files in "${uri.fullPath}"');
+        log.info('waiting for files in "${EsbConfig.get().path(uri.fullPath)}"');
         processFolder(uri);
     }
 
 
     private static var _processing:Array<String> = [];
     private function processFolder(uri:Uri) {
-        var fullPath = Path.normalize(uri.fullPath);
-        fullPath = fullPath.replace("C/", "C:/");
+        var fullPath = EsbConfig.get().path(uri.fullPath);
         if (!FileSystem.exists(fullPath)) {
             FileSystem.createDirectory(fullPath);
         }
@@ -96,7 +96,7 @@ class FileProducer implements IProducer {
                     max--;
                     if (max == 0) {
                         var end = Sys.time();
-                        trace("-------------------------------------------------> ALL DONE IN: ", Math.round((end - start) * 1000) + " ms");
+                        log.performance('files processed in ${Math.round((end - start) * 1000)}ms');
                         haxe.Timer.delay(processFolder.bind(uri), pollInterval);
                     }
                 }, error -> {

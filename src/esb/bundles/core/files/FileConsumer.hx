@@ -1,5 +1,6 @@
 package esb.bundles.core.files;
 
+import esb.core.config.sections.EsbConfig;
 import esb.core.IBundle;
 import sys.io.File;
 import sys.FileSystem;
@@ -21,9 +22,7 @@ class FileConsumer implements IConsumer {
         log.info('creating consumer for ${uri.toString()}');
         from(uri, (uri, message) -> {
             return new Promise((resolve, reject) -> {
-                var fullPath = Path.normalize(uri.fullPath);
-                // TODO: do better
-                fullPath = fullPath.replace("C/", "C:/");
+                var fullPath = EsbConfig.get().path(uri.fullPath);
                 if (!FileSystem.exists(fullPath)) {
                     FileSystem.createDirectory(fullPath);
                 }
